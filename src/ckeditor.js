@@ -120,7 +120,7 @@ Editor.defaultConfig = {
 };
 
 
-function MentionCustomizationss (editor) {
+function MentionCustomization (editor) {
 
 	// The upcast converter will convert view <a class="mention" href="" data-user-id="">
 	// elements to the model 'mention' text attribute.
