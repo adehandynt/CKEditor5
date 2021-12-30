@@ -3,20 +3,24 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor.js';
+import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment.js';
 import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat.js';
+import AutoLink from '@ckeditor/ckeditor5-link/src/autolink.js';
+import Base64UploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter.js';
 import BlockQuote from '@ckeditor/ckeditor5-block-quote/src/blockquote.js';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold.js';
-import CKFinderUploadAdapter from '@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter.js';
 import Code from '@ckeditor/ckeditor5-basic-styles/src/code.js';
-import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock.js';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials.js';
+import FontBackgroundColor from '@ckeditor/ckeditor5-font/src/fontbackgroundcolor.js';
 import FontColor from '@ckeditor/ckeditor5-font/src/fontcolor.js';
+import FontFamily from '@ckeditor/ckeditor5-font/src/fontfamily.js';
 import FontSize from '@ckeditor/ckeditor5-font/src/fontsize.js';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading.js';
 import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight.js';
+import HtmlEmbed from '@ckeditor/ckeditor5-html-embed/src/htmlembed.js';
 import Image from '@ckeditor/ckeditor5-image/src/image.js';
-import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption.js';
 import ImageInsert from '@ckeditor/ckeditor5-image/src/imageinsert.js';
+import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize.js';
 import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle.js';
 import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar.js';
 import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload.js';
@@ -28,7 +32,15 @@ import MediaEmbed from '@ckeditor/ckeditor5-media-embed/src/mediaembed.js';
 import Mention from '@ckeditor/ckeditor5-mention/src/mention.js';
 import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph.js';
 import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice.js';
+import SourceEditing from '@ckeditor/ckeditor5-source-editing/src/sourceediting.js';
+import SpecialCharacters from '@ckeditor/ckeditor5-special-characters/src/specialcharacters.js';
+import SpecialCharactersCurrency from '@ckeditor/ckeditor5-special-characters/src/specialcharacterscurrency.js';
+import SpecialCharactersText from '@ckeditor/ckeditor5-special-characters/src/specialcharacterstext.js';
+import Strikethrough from '@ckeditor/ckeditor5-basic-styles/src/strikethrough.js';
 import Table from '@ckeditor/ckeditor5-table/src/table.js';
+import TableCaption from '@ckeditor/ckeditor5-table/src/tablecaption.js';
+import TableCellProperties from '@ckeditor/ckeditor5-table/src/tablecellproperties';
+import TableProperties from '@ckeditor/ckeditor5-table/src/tableproperties';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar.js';
 import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation.js';
 import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline.js';
@@ -38,20 +50,24 @@ class Editor extends ClassicEditor {}
 
 // Plugins to include in the build.
 Editor.builtinPlugins = [
+	Alignment,
 	Autoformat,
+	AutoLink,
+	Base64UploadAdapter,
 	BlockQuote,
 	Bold,
-	CKFinderUploadAdapter,
 	Code,
-	CodeBlock,
 	Essentials,
+	FontBackgroundColor,
 	FontColor,
+	FontFamily,
 	FontSize,
 	Heading,
 	Highlight,
+	HtmlEmbed,
 	Image,
-	ImageCaption,
 	ImageInsert,
+	ImageResize,
 	ImageStyle,
 	ImageToolbar,
 	ImageUpload,
@@ -63,12 +79,19 @@ Editor.builtinPlugins = [
 	Mention,
 	Paragraph,
 	PasteFromOffice,
+	SourceEditing,
+	SpecialCharacters,
+	SpecialCharactersCurrency,
+	SpecialCharactersText,
+	Strikethrough,
 	Table,
+	TableCaption,
+	TableCellProperties,
+	TableProperties,
 	TableToolbar,
 	TextTransformation,
 	Underline,
-	WordCount,
-	MentionCustomization
+	WordCount
 ];
 
 // Editor configuration.
@@ -79,26 +102,26 @@ Editor.defaultConfig = {
 			'|',
 			'bold',
 			'italic',
-			'underline',
 			'link',
 			'bulletedList',
 			'numberedList',
-			'fontColor',
 			'fontSize',
+			'fontColor',
+			'underline',
 			'|',
 			'outdent',
 			'indent',
 			'|',
-			'imageUpload',
+			'fontFamily',
 			'blockQuote',
 			'insertTable',
 			'mediaEmbed',
-			'codeBlock',
-			'code',
-			'highlight',
+			'imageUpload',
 			'imageInsert',
+			'highlight',
+			'sourceEditing',
 			'undo',
-			'redo',
+			'redo'
 		]
 	},
 	language: 'en',
@@ -114,73 +137,11 @@ Editor.defaultConfig = {
 		contentToolbar: [
 			'tableColumn',
 			'tableRow',
-			'mergeTableCells'
+			'mergeTableCells',
+			'tableCellProperties',
+			'tableProperties'
 		]
 	}
 };
-
-
-function MentionCustomization (editor) {
-
-	// The upcast converter will convert view <a class="mention" href="" data-user-id="">
-	// elements to the model 'mention' text attribute.
-	editor.conversion.for('upcast').elementToAttribute({
-	  view: {
-		name: 'a',
-		key: 'data-mention',
-		classes: 'mention',
-		attributes: {
-		  href: true,
-		  'data-user-id': true,
-		},
-	  },
-	  model: {
-		key: 'mention',
-		value: (viewItem) => {
-		  // The mention feature expects that the mention attribute value
-		  // in the model is a plain object with a set of additional attributes.
-		  // In order to create a proper object use the toMentionAttribute() helper method:
-		  const mentionAttribute = editor.plugins
-			.get('Mention')
-			.toMentionAttribute(viewItem, {
-			  // Add any other properties that you need.
-			  link: viewItem.getAttribute('href'),
-			  userId: viewItem.getAttribute('data-user-id'),
-			})
-  
-		  return mentionAttribute
-		},
-	  },
-	  converterPriority: 'high',
-	})
-  
-	// Downcast the model 'mention' text attribute to a view <a> element.
-	editor.conversion.for('downcast').attributeToElement({
-	  model: 'mention',
-	  view: (modelAttributeValue, { writer }) => {
-		// Do not convert empty attributes (lack of value means no mention).
-		if (!modelAttributeValue) {
-		  return
-		}
-  
-		return writer.createAttributeElement(
-		  'a',
-		  {
-			class: 'mention',
-			'data-mention': modelAttributeValue.id,
-			'data-user-id': modelAttributeValue.userId,
-			href: modelAttributeValue.link,
-		  },
-		  {
-			// Make mention attribute to be wrapped by other attribute elements.
-			priority: 20,
-			// Prevent merging mentions together.
-			id: modelAttributeValue.uid,
-		  }
-		)
-	  },
-	  converterPriority: 'high',
-	})
-  }
 
 export default Editor;
